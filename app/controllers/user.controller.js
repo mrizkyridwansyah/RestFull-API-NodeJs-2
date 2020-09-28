@@ -7,29 +7,19 @@ const options = db.Sequelize.Op;
 //Method for Users
 
 //find records
-exports.find = (req, res) => {	
-	let whereEmail = req.query.email ? {
-		email: {
-			[options.like] : '%' + req.query.email +'%'
-		}
-	} : null;
-
-	let whereActive = req.query.active ? {
-		is_active: req.query.active
-	} : null;
-
-	let condition = {
-		[options.or]: [whereEmail, whereActive]
-	};
-
-	User.findAll({ where: condition})
-		.then((data) => {
-			res.send(data);
-		}).catch((error) => {
-			res.status(500).send({
-				message: error.message || "Something wrong when get user"
-			})
+exports.find = (req, res) => {		
+	User.findAll({
+		attributes: {
+			exclude: ['password']	
+		} 
+	})
+	.then((data) => {
+		res.send(data);
+	}).catch((error) => {
+		res.status(500).send({
+			message: error.message || "Something wrong when get user"
 		})
+	})
 }
 
 //find records by PK

@@ -1,4 +1,4 @@
-const dotenv = require('dotenv');//TO READ .env file
+const dotenv = require('dotenv');//TO READ .env file use module dotenv, this code for init the module
 const express = require('express');
 const bodyParser = require('body-parser');//mempermudah request yg dikirim client
 const cors = require('cors');//
@@ -7,26 +7,27 @@ const cors = require('cors');//
 const db = require('./app/models');
 //init express
 const app = express();
+//to use object dotenv
 dotenv.config();
-//list client yg bisa akses server.js
+//list client which access server.js
 let whiteList = [
-	'http://localhost:3000'
+	'http://localhost:8081'
 ];
 
 let corsOption = {
-	origin: function (origin, callback) {
+	origin: function (origin, callback) {		
 		if(whiteList.indexOf(origin) !== -1 || !origin){
 			callback(null, true);
 		} else { 
+			console.log(whiteList.indexOf(origin));
 			callback(new Error('Not Allowed by CORS'));
 		}
 	}
 }
-
 //Sync database
 db.sequelize.sync({ alter:true });
 
-app.use(cors(corsOption));
+app.use(cors(corsOption));	
 
 //parse request application/json & x-www-form-urlencode
 app.use(bodyParser.json());
