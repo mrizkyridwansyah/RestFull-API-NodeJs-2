@@ -26,6 +26,9 @@ exports.find = (req, res) => {
 exports.getById = (req, res) => {
 	let ID = req.params.id;
 	User.findAll({
+		attributes: {
+			exclude: ['password']	
+		},
 		where : {
 			id: ID
 		}
@@ -51,16 +54,34 @@ exports.create = (req, res) => {
 		email: req.body.email,
 		password: md5(req.body.password)
 	}
-	
-	//using method create from module sequelize
-	User.create(data)
-		.then((result) =>{
-			res.send(result);
-		}).catch((error) => {
-			res.status(500).send({
-				message: error.message || 'Something wrong when create user'
-			})
+
+	User.findAll({
+		where : {
+			email: data.email
+		}
+	})
+	.then((result) => {
+		if(result.length == 0){
+			//using method create from module sequelize
+			User.create(data)
+			.then((result) =>{
+				res.send(result);
+			}).catch((error) => {
+				res.status(500).send({
+					message: error.message || 'Something wrong when create user'
+				})
+			})			
+		}
+		else{
+			res.status(409).send({
+				message: 'Email has been used'
+			})			
+		}
+	}).catch((error) =>{
+		res.status(500).send({
+			message: error.message || "Something wrong when find user"
 		})
+	})
 }
 
 //Update record by PK
